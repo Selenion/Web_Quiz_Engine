@@ -66,7 +66,7 @@ public class Quiz {
         this.options = options;
     }
 
-    public String getEmail() {
+    public String checkEmail() {
         return email;
     }
 
@@ -74,7 +74,7 @@ public class Quiz {
         this.email = email;
     }
 
-    public List<Integer> getAnswer() {
+    private List<Integer> getAnswer() {
         if(!(answer == null)) {
             Collections.sort(answer);}else{answer = new ArrayList<>();}
         return answer;

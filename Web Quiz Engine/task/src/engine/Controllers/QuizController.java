@@ -1,8 +1,10 @@
 package engine.Controllers;
 
 import engine.Entities.Quiz;
+
 import engine.Repository.QuizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -11,13 +13,18 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 @RestController
 public class QuizController {
 
     @Autowired
     QuizRepository quizRepository;
+    @Autowired
+    QuizService quizService;
 
     @GetMapping(path = "/api/quizzes/{id}", produces = "application/json")
     public Object getApiQuiz(@PathVariable Integer id){
@@ -52,23 +59,13 @@ public class QuizController {
     }
 
     @GetMapping(path = "/api/quizzes", produces = "application/json")
-    public Object getAllQuiz(){
+    public Object getAllQuiz(@RequestParam(defaultValue = "0") Integer page){
 
-        ArrayList<Quiz> quizzes = (ArrayList<Quiz>) quizRepository.findAll();
-        if(quizzes.size()!=0){
-                ArrayList<HashMap<String, Object>> maps = new ArrayList<>();
-                for (Quiz q : quizzes
-                ) {
-                    HashMap<String, Object> outmap = new HashMap<>();
-                    outmap.put("id", q.getId());
-                    outmap.put("title", q.getTitle());
-                    outmap.put("text", q.getText());
-                    outmap.put("options", q.getOptions());
-                    maps.add(outmap);
-                }
-                return maps;
+        Page<Quiz> quizzes = quizService.getAllQuiz(page);
+        if(quizzes.hasContent()){
+                return quizzes;
         }else{
-            return new ResponseEntity(new ArrayList[0], HttpStatus.OK);
+            return new ResponseEntity(quizzes, HttpStatus.OK);
         }
     }
 
@@ -100,7 +97,7 @@ public class QuizController {
         String userMail = authentication.getName();
 
         if (quizRepository.existsById(id)){
-            if(quizRepository.findById(id).get().getEmail().equalsIgnoreCase(userMail)) {
+            if(quizRepository.findById(id).get().checkEmail().equalsIgnoreCase(userMail)) {
                 quizRepository.deleteById(id);
                 return new ResponseEntity(HttpStatus.NO_CONTENT);
             }else{
