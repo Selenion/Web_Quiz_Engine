@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class QuizService {
 
     @Autowired
-    QuizRepository quizRepository;
+    private QuizRepository quizRepository;
 
     public Page<Quiz> getAllQuiz(Integer page){
         Pageable paging = PageRequest.of(page, 10);

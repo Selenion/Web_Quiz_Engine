@@ -17,7 +17,7 @@ import java.util.HashMap;
 public class UsersController {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @PostMapping(path = "/api/register", consumes = "application/json")
     public ResponseEntity addUser(@Valid @RequestBody HashMap<String,String> map){

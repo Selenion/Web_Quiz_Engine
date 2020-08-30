@@ -3,7 +3,7 @@ package engine.Controllers;
 import engine.Entities.CompleteRecord;
 import engine.Entities.Quiz;
 
-import engine.Repository.CompleteRecordRepository;
+import engine.Repository.*;
 import engine.Repository.QuizRepository;
 import engine.Services.CompleteRecordService;
 import engine.Services.QuizService;
@@ -23,13 +23,13 @@ import java.util.*;
 public class QuizController {
 
     @Autowired
-    QuizRepository quizRepository;
+    private QuizRepository quizRepository;
     @Autowired
-    QuizService quizService;
+    private QuizService quizService;
     @Autowired
-    CompleteRecordService completeRecordService;
+    private CompleteRecordService completeRecordService;
     @Autowired
-    CompleteRecordRepository completeRecordRepository;
+    private CompleteRecordRepository completeRecordRepository;
 
     @GetMapping(path = "/api/quizzes/{id}", produces = "application/json")
     public Object getApiQuiz(@PathVariable Integer id){
@@ -57,7 +57,7 @@ public class QuizController {
 
         TreeMap<String,Object> outmap = new TreeMap<>();
         outmap.put("id", quiz.getId());
-        outmap.put("title", quiz.getTitle());;
+        outmap.put("title", quiz.getTitle());
         outmap.put("text", quiz.getText());
         outmap.put("options", quiz.getOptions());
         return outmap;
