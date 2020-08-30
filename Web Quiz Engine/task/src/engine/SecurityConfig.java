@@ -1,6 +1,6 @@
 package engine;
 
-import engine.Controllers.H2UserDetailsService;
+import engine.Services.H2UserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

@@ -1,8 +1,12 @@
 package engine.Controllers;
 
+import engine.Entities.CompleteRecord;
 import engine.Entities.Quiz;
 
+import engine.Repository.CompleteRecordRepository;
 import engine.Repository.QuizRepository;
+import engine.Services.CompleteRecordService;
+import engine.Services.QuizService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -13,10 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @RestController
 public class QuizController {
@@ -25,6 +26,10 @@ public class QuizController {
     QuizRepository quizRepository;
     @Autowired
     QuizService quizService;
+    @Autowired
+    CompleteRecordService completeRecordService;
+    @Autowired
+    CompleteRecordRepository completeRecordRepository;
 
     @GetMapping(path = "/api/quizzes/{id}", produces = "application/json")
     public Object getApiQuiz(@PathVariable Integer id){
@@ -79,6 +84,13 @@ public class QuizController {
             if(quiz.solveQuiz(answer.get("answer"))){
                 ans.put("success",true);
                 ans.put("feedback", "Congratulations, you're right!");
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                String userMail = authentication.getName();
+                CompleteRecord completeRecord = new CompleteRecord();
+                completeRecord.setId(id);
+                completeRecord.setEmail(userMail);
+                completeRecord.setCompletedAt(Calendar.getInstance());
+                completeRecordRepository.save(completeRecord);
             }else{
                 ans.put("success",false);
                 ans.put("feedback", "Wrong answer! Please, try again.");
@@ -105,6 +117,18 @@ public class QuizController {
             }
         }else{
             return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping(path = "/api/quizzes/completed", produces = "application/json")
+    public ResponseEntity getAllCompleted(@RequestParam(defaultValue = "0") Integer page){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userMail = authentication.getName();
+        Page<CompleteRecord> records = completeRecordService.getAllCompleteRecords(page,userMail);
+        if(records.hasContent()){
+            return new ResponseEntity(records, HttpStatus.OK);
+        }else{
+            return new ResponseEntity(records, HttpStatus.OK);
         }
     }
 
